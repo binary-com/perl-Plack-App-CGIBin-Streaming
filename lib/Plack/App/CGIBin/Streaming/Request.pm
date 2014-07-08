@@ -151,15 +151,16 @@ sub finalize {
     #    "finalize done";
 }
 
-sub method      { $_[0]->{env}->{REQUEST_METHOD} }
-sub port        { $_[0]->{env}->{SERVER_PORT} }
-sub user        { $_[0]->{env}->{REMOTE_USER} }
-sub request_uri { $_[0]->{env}->{REQUEST_URI} }
-sub path_info   { $_[0]->{env}->{PATH_INFO} }
-sub path        { $_[0]->{env}->{PATH_INFO} || '/' }
-sub script_name { $_[0]->{env}->{SCRIPT_NAME} }
+# sub method      { $_[0]->{env}->{REQUEST_METHOD} }
+# sub port        { $_[0]->{env}->{SERVER_PORT} }
+# sub user        { $_[0]->{env}->{REMOTE_USER} }
+# sub request_uri { $_[0]->{env}->{REQUEST_URI} }
+# sub path_info   { $_[0]->{env}->{PATH_INFO} }
+# sub path        { $_[0]->{env}->{PATH_INFO} || '/' }
+# sub script_name { $_[0]->{env}->{SCRIPT_NAME} }
 
-package Plack::App::CGIBin::Streaming::Request::Demolished;
+package                         # prevent CPAN indexing
+    Plack::App::CGIBin::Streaming::Request::Demolished;
 use strict;
 
 sub AUTOLOAD {
