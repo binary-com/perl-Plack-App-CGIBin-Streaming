@@ -1,0 +1,9 @@
+/Plack-App-CGIBin-Streaming-*
+/.build
+/_build*
+/Build
+MYMETA.*
+!META.json
+/.prove
+*~
+/blib/
