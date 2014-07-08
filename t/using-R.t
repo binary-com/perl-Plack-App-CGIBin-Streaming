@@ -6,7 +6,8 @@ use constant P=>'Plack::App::CGIBin::Streaming';
 
 BEGIN {
     unless (defined $ENV{PLACK_TEST_IMPL}) {
-        @ENV{qw/PLACK_TEST_IMPL PLACK_SERVER/}=qw/Server Test::Server/;
+        unshift @INC, 't';
+        @ENV{qw/PLACK_TEST_IMPL PLACK_SERVER/}=qw/Server TestServer/;
     }
 }
 use Plack::Test;
