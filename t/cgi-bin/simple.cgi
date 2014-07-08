@@ -7,7 +7,7 @@ use warnings;
 
 if ($ENV{QUERY_STRING}=~s/\Aone_piece,//) {
     print <<'EOF'.("huhu\n" x ($ENV{QUERY_STRING}||1));
-Status: 200
+Status: 404
 X-my-header: fritz
 Content-Type: my/text
 

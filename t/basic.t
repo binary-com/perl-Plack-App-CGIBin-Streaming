@@ -37,7 +37,7 @@ test_psgi
 
         note 'one_piece';
         $res=$cb->(GET '/simple.cgi?one_piece,');
-        is $res->code, 200, 'status';
+        is $res->code, 404, 'status';
         is $res->content, "huhu\n", 'content';
         is $res->header('Content-Length'), 5, 'cl';
         is $res->header('X-My-Header'), 'fritz', 'X- header';
@@ -55,7 +55,7 @@ test_psgi
 
         note 'max_buffer==8000: exact limit (one piece)';
         $res=$cb->(GET '/simple.cgi?one_piece,1600');
-        is $res->code, 200, 'status';
+        is $res->code, 404, 'status';
         is $res->content, "huhu\n" x 1600, 'content';
         is $res->header('Content-Length'), 1600*5, 'cl';
         is $res->header('X-My-Header'), 'fritz', 'X- header';
@@ -77,7 +77,7 @@ test_psgi
 
         note 'max_buffer==8000: limit exceeded (one piece)';
         $res=$cb->(GET '/simple.cgi?one_piece,1601');
-        is $res->code, 200, 'status';
+        is $res->code, 404, 'status';
         is $res->content, "huhu\n" x 1601, 'content';
         is $res->header('Content-Length'), undef, 'no cl';
     SKIP: {
