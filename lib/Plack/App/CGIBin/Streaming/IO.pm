@@ -17,20 +17,21 @@ sub UTF8 {
 }
 
 sub WRITE {
-    my ($self, $buf, $fh) = @_;
+    #my ($self, $buf, $fh) = @_;
 
-    Plack::App::CGIBin::Streaming->request->print_content($buf);
-    return length $buf;
+    # use $_[1] directly to avoid another copy
+    Plack::App::CGIBin::Streaming->request->print_content($_[1]);
+    return length $_[1];
 }
 
 sub FLUSH {
-    my ($self, $fh) = @_;
+    #my ($self, $fh) = @_;
 
     Plack::App::CGIBin::Streaming->request->flush;
 }
 
 sub FILL {
-    my ($self, $fh) = @_;
+    #my ($self, $fh) = @_;
 
     die "This layer supports write operations only";
 }

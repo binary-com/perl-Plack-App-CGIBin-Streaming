@@ -36,7 +36,10 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008005"
+            "CGI::Compile" : "0.17",
+            "PerlIO::via" : "0.11",
+            "Plack" : "0.9989",
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -46,6 +49,20 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming/issues"
+      },
+      "homepage" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming.git",
+         "web" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Torsten Förtsch <torsten@binary.com>"
+   ]
 }
 

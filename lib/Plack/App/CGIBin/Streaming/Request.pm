@@ -14,7 +14,7 @@ our $DEFAULT_MAX_BUFFER=8000;
 BEGIN {
     @attr=(qw/env responder writer _buffer _buflen _headers max_buffer
               content_type filter_before filter_after on_status_output
-              parse_headers _header_buffer status/);
+              parse_headers _header_buffer status notes on_flush on_finalize/);
     for (@attr) {
         my $attr=$_;
         no strict 'refs';
@@ -32,9 +32,12 @@ sub new {
     my $self=bless {
                     content_type=>$DEFAULT_CONTENT_TYPE,
                     max_buffer=>$DEFAULT_MAX_BUFFER,
-                    filter_before=>sub{1},
+                    filter_before=>sub{},
                     filter_after=>sub{},
                     on_status_output=>sub{},
+                    on_flush=>sub{},
+                    on_finalize=>sub{},
+                    notes=>+{},
                     _headers=>[],
                     _buffer=>[],
                     _buflen=>0,
@@ -80,18 +83,19 @@ sub print_content {
         return;
     }
 
-    $self->{filter_before}->($self, \@_) or return;
+    my @data=@_;
+    $self->{filter_before}->($self, \@data);
 
     my $len = 0;
-    $len += length $_ for @_;
+    $len += length $_ for @data;
     #warn "print_content: $len bytes written";
-    push @{$self->{_buffer}}, @_;
+    push @{$self->{_buffer}}, @data;
     $len += $self->{_buflen};
     $self->{_buflen}=$len;
 
     $self->flush if $len > $self->{max_buffer};
 
-    $self->filter_after->($self, \@_);
+    $self->filter_after->($self, \@data);
 }
 
 sub _status_out {
@@ -122,13 +126,15 @@ sub flush {
     @{$self->{_buffer}}=();
     $self->{_buflen}=0;
 
+    $self->{on_flush}->($self);
+
     return 0;
 }
 
 sub finalize {
     my $self = shift;
 
-    #warn "finalize";
+    $self->{on_finalize}->($self);
     if ($self->{writer}) {
         $self->{writer}->write(join '', @{$self->{_buffer}});
         $self->{writer}->close;

@@ -10,6 +10,7 @@ my @args=split /,/, $ENV{QUERY_STRING};
 
 my $pc;
 my $cl=1;
+my $flush_after;
 for (my $i=0; $i<@args; $i+=2) {
     my ($k, $v)=@args[$i, $i+1];
 
@@ -19,13 +20,37 @@ for (my $i=0; $i<@args; $i+=2) {
         /^pc$/ and $r->print_header('pc', 1), $pc=1, next;
         /^cl$/ and $cl=$v, next;
         /^ct$/ and $r->content_type($v), next;
+        /^flush_after$/ and $flush_after=$v, next;
     }
 }
 
+my $len=0;
 if ($pc) {
-    $r->print_content('x' x 100) for (1..int($cl/100));
+    for (1..int($cl/100)) {
+        $r->print_content('x' x 100);
+        $len+=100;
+        if ($flush_after and $flush_after<=$len) {
+            $r->print_content("<!-- FlushHead -->\nflushed\n");
+            $len=0;
+        }
+    }
     $r->print_content('x' x ($cl%100));
+    $len+=$cl%100;
+    if ($flush_after and $flush_after<=$len) {
+        $r->print_content("<!-- FlushHead -->\nflushed\n");
+    }
 } else {
-    print('x' x 100) for (1..int($cl/100));
+    for (1..int($cl/100)) {
+        print('x' x 100);
+        $len+=100;
+        if ($flush_after and $flush_after<=$len) {
+            print "\nflushed\n<!-- FlushHead -->";
+            $len=0;
+        }
+    }
     print('x' x ($cl%100));
+    $len+=$cl%100;
+    if ($flush_after and $flush_after<=$len) {
+        print "\nflushed\n<!-- FlushHead -->";
+    }
 }
