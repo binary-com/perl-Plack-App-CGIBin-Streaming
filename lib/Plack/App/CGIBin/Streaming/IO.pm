@@ -20,14 +20,20 @@ sub WRITE {
     #my ($self, $buf, $fh) = @_;
 
     # use $_[1] directly to avoid another copy
-    Plack::App::CGIBin::Streaming->request->print_content($_[1]);
+    $Plack::App::CGIBin::Streaming::R->print_content($_[1]);
     return length $_[1];
 }
 
 sub FLUSH {
     #my ($self, $fh) = @_;
 
-    Plack::App::CGIBin::Streaming->request->flush;
+    unless ($Plack::App::CGIBin::Streaming::R) {
+        require Carp;
+        Carp::cluck "\$Plack::App::CGIBin::Streaming::R must be defined here";
+        return;
+    }
+
+    $Plack::App::CGIBin::Streaming::R->flush;
 }
 
 sub FILL {
