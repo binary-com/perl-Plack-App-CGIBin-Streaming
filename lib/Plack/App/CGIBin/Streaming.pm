@@ -45,7 +45,7 @@ sub prepare_app {
                  : $self->root.'/'.$pattern);
         # warn "  pat=$pat\n";
         for my $fn (glob $pat) {
-            warn "preloading $fn\n";
+            # warn "preloading $fn\n";
             $self->{_compiled}->{$fn} = do {
                 local $0 = $fn;            # keep FindBin happy
 
