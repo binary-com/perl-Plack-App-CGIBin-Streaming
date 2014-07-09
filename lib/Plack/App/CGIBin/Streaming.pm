@@ -14,14 +14,35 @@ use Plack::App::CGIBin::Streaming::IO;
 
 use Plack::Util::Accessor qw/request_class
                              request_params
-                             preload
-                             passenv
-                             setenv/;
+                             preload/;
 
 sub allow_path_info { 1 }
 
-our $R;
+sub prepare_app {
+    my $self=shift;
 
+    # warn "\n\nprepare_app [@{$self->preload}]\n\n";
+
+    $self->SUPER::prepare_app;
+    return unless $self->preload;
+
+    for my $pattern (@{$self->preload}) {
+        my $pat=($pattern=~m!^/!
+                 ? $pattern
+                 : $self->root.'/'.$pattern);
+        # warn "  pat=$pat\n";
+        for my $fn (glob $pat) {
+            # warn "    preloading $fn\n";
+            $self->{_compiled}->{$fn} = do {
+                local $0 = $fn;            # keep FindBin happy
+
+                $self->mkapp(CGI::Compile->compile($fn));
+            };
+        }
+    }
+}
+
+our $R;
 sub request { return $R }
 
 sub mkapp {

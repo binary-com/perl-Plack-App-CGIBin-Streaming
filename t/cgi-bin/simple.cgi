@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+BEGIN {push @main::loaded, __FILE__}
+
 #warn "\n\n$ENV{QUERY_STRING}\n\n";
 
 if ($ENV{QUERY_STRING}=~s/\Aone_piece,//) {

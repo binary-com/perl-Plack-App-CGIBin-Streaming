@@ -107,9 +107,6 @@ sub _status_out {
         if $is_done;
     $self->on_status_output->($self);
 
-    # $self->print_header('X-Accel-Buffering', 'no')
-    #     if $self->content_type =~ m!text/html!i;
-
     $self->{writer}=$self->{responder}->([$self->{status},
                                           $self->{_headers},
                                           $is_done ? $self->{_buffer}: ()]);

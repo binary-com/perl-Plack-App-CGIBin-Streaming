@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Plack::App::CGIBin::Streaming;
 
+BEGIN {push @main::loaded, __FILE__}
+
 my $r=Plack::App::CGIBin::Streaming->request;
 
 my @args=split /,/, $ENV{QUERY_STRING};
