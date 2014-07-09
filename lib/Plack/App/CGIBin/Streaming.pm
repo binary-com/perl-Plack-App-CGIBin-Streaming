@@ -5,6 +5,19 @@ use strict;
 use warnings;
 our $VERSION = '0.01';
 
+BEGIN {
+    # this works around a bug in perl
+
+    # In Perl (at least up to 5.18.0) the first assignment to $SIG{CHLD}
+    # or $SIG{CLD} determines which name is later passed to the signal handler
+    # on systems like Linux that support both names.
+    # This hack tries to be the first such assignment in the perl program
+    # and thus pin down that name.
+    # Net::Server based servers like starman rely on "CHLD" to be passed to
+    # the signal handler.
+    local $SIG{CHLD}=$SIG{CHLD};
+}
+
 use parent qw/Plack::App::File/;
 use CGI;
 use CGI::Compile;
