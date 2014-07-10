@@ -12,10 +12,6 @@ sub PUSHED {
     return bless \$dummy, $class;
 }
 
-sub UTF8 {
-    return 1;
-}
-
 sub WRITE {
     #my ($self, $buf, $fh) = @_;
 
