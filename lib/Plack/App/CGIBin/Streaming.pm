@@ -118,6 +118,7 @@ sub serve_path {
 }
 
 1;
+
 __END__
 
 =encoding utf-8
@@ -177,12 +178,18 @@ Although multipart HTTP messages are quite exotic, there are situations
 where you rather want to prevent this buffering. If your document is very
 large for example, each instance of your plack server allocates the RAM
 to buffer it. Also, you might perhaps send out the C<< <head> >> section
-of your HTTP document as fast as possible to have the browser load JS and
-CSS while the plack server is still working on producing the actual document.
+of your HTTP document as fast as possible to enable the browser load JS and
+CSS while the plack server is still busy with producing the actual document.
 
 C<Plack::App::CGIBin::Streaming> compiles the CGI scripts using
 L<CGI::Compile> and provides a runtime environment similar to
-C<Plack::App::CGIBin>.
+C<Plack::App::CGIBin>. Compiled scripts are cached. For production
+environments, it is possible to precompile and cache scripts at server
+start time, see the C<preload> option below.
+
+Every single request is represented as an object that inherits from
+L<Plack::App::CGIBin::Streaming::Request>. This class mainly provides
+means for handling response headers and body.
 
 =head2 Options
 
@@ -226,8 +233,8 @@ appended to the parameter list like:
 
 =item preload
 
-In a production environment probably you want to use a (pre)forking server
-to run your application. In this case is is sensible to compile as much
+In a production environment, you probably want to use a (pre)forking server
+to run the application. In this case is is sensible to compile as much
 perl code as possible at server startup time by the parent process because
 then all the children share the RAM pages where the code resides (by
 copy-on-write) and you utilize your server resources much better.
@@ -241,8 +248,27 @@ C<preload> value. C<Plack::App::CGIBin::Streaming> will then load and
 compile all the scripts matching all the patterns when the app object is
 created.
 
-Currently, there is no way to watch compiled scripts for changes. To recompile
-a script you have to restart the server.
+This technique has benefits and drawbacks:
+
+=over 4
+
+=item pro: more concurrent worker children in less RAM
+
+see above
+
+=item con: no way to reload the application on the fly
+
+when your scripts change you have to restart the server. Without preloading
+anything you could just kill all the worker children (or signal them to do
+so after the next request).
+
+=item pro/con: increased privileges while preloading
+
+the HTTP standard port is 80 and, thus, requires root privileges to bind to.
+scripts are preloaded before the server opens the port. So, even if it later
+drops privilges, at preload time you still are root.
+
+=back
 
 =back
 
@@ -255,8 +281,11 @@ provides:
 
 =item the global variable C<$Plack::App::CGIBin::Streaming::R>
 
-For the request lifetime it contains the actual reques object. This variable
+For the request lifetime it contains the actual request object. This variable
 is C<local>ized. There is also a way to access this variable as class method.
+
+If you use a L<Coro> based plack server, make sure to replace the guts
+of this variable when switching threads, see C<swap_sv()> in L<Coro::State>.
 
 =item C<< Plack::App::CGIBin::Streaming->request >> or
 C<Plack::App::CGIBin::Streaming::request>
@@ -317,5 +346,17 @@ of the full license at:
 L<http://www.perlfoundation.org/artistic_license_2_0>
 
 =head1 SEE ALSO
+
+=over 4
+
+=item * L<Plack::App::CGIBin>
+
+=item * L<CGI::Compile>
+
+=item * L<Plack::App::CGIBin::Streaming::Request>
+
+=item * L<Plack::App::CGIBin::Streaming::IO>
+
+=back
 
 =cut

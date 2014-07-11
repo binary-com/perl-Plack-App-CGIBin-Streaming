@@ -39,3 +39,54 @@ sub FILL {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Plack::App::CGIBin::Streaming::IO - a helper PerlIO layer for
+Plack::App::CGIBin::Streaming
+
+=head1 SYNOPSIS
+
+ binmode HANDLE, 'via(Plack::App::CGIBin::Streaming::IO)';
+
+=head1 DESCRIPTION
+
+This module provides a L<PerlIO::via> layer to capture all the output
+written to C<HANDLE>. It uses the global variable
+C<$Plack::App::CGIBin::Streaming::R> and passes the output via the
+C<print_content> method.
+
+A flush operation is passed by calling the C<flush> method.
+
+Attempts to read from a file handle configured with this layer result in an
+exception.
+
+=head1 AUTHOR
+
+Torsten Förtsch E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2014 Binary.com
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a copy
+of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Plack::App::CGIBin::Streaming>
+
+=back
+
+=cut
