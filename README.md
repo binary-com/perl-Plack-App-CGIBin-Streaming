@@ -53,12 +53,18 @@ Although multipart HTTP messages are quite exotic, there are situations
 where you rather want to prevent this buffering. If your document is very
 large for example, each instance of your plack server allocates the RAM
 to buffer it. Also, you might perhaps send out the `<head>` section
-of your HTTP document as fast as possible to have the browser load JS and
-CSS while the plack server is still working on producing the actual document.
+of your HTTP document as fast as possible to enable the browser load JS and
+CSS while the plack server is still busy with producing the actual document.
 
 `Plack::App::CGIBin::Streaming` compiles the CGI scripts using
 [CGI::Compile](https://metacpan.org/pod/CGI::Compile) and provides a runtime environment similar to
-`Plack::App::CGIBin`.
+`Plack::App::CGIBin`. Compiled scripts are cached. For production
+environments, it is possible to precompile and cache scripts at server
+start time, see the `preload` option below.
+
+Every single request is represented as an object that inherits from
+[Plack::App::CGIBin::Streaming::Request](https://metacpan.org/pod/Plack::App::CGIBin::Streaming::Request). This class mainly provides
+means for handling response headers and body.
 
 ## Options
 
@@ -100,8 +106,8 @@ Additionally, these parameters are accepted:
 
 - preload
 
-    In a production environment probably you want to use a (pre)forking server
-    to run your application. In this case is is sensible to compile as much
+    In a production environment, you probably want to use a (pre)forking server
+    to run the application. In this case is is sensible to compile as much
     perl code as possible at server startup time by the parent process because
     then all the children share the RAM pages where the code resides (by
     copy-on-write) and you utilize your server resources much better.
@@ -115,8 +121,23 @@ Additionally, these parameters are accepted:
     compile all the scripts matching all the patterns when the app object is
     created.
 
-    Currently, there is no way to watch compiled scripts for changes. To recompile
-    a script you have to restart the server.
+    This technique has benefits and drawbacks:
+
+    - pro: more concurrent worker children in less RAM
+
+        see above
+
+    - con: no way to reload the application on the fly
+
+        when your scripts change you have to restart the server. Without preloading
+        anything you could just kill all the worker children (or signal them to do
+        so after the next request).
+
+    - pro/con: increased privileges while preloading
+
+        the HTTP standard port is 80 and, thus, requires root privileges to bind to.
+        scripts are preloaded before the server opens the port. So, even if it later
+        drops privilges, at preload time you still are root.
 
 ## Runtime environment
 
@@ -125,8 +146,11 @@ provides:
 
 - the global variable `$Plack::App::CGIBin::Streaming::R`
 
-    For the request lifetime it contains the actual reques object. This variable
+    For the request lifetime it contains the actual request object. This variable
     is `local`ized. There is also a way to access this variable as class method.
+
+    If you use a [Coro](https://metacpan.org/pod/Coro) based plack server, make sure to replace the guts
+    of this variable when switching threads, see `swap_sv()` in [Coro::State](https://metacpan.org/pod/Coro::State).
 
 - `Plack::App::CGIBin::Streaming->request` or
 `Plack::App::CGIBin::Streaming::request`
@@ -185,3 +209,8 @@ of the full license at:
 [http://www.perlfoundation.org/artistic\_license\_2\_0](http://www.perlfoundation.org/artistic_license_2_0)
 
 # SEE ALSO
+
+- [Plack::App::CGIBin](https://metacpan.org/pod/Plack::App::CGIBin)
+- [CGI::Compile](https://metacpan.org/pod/CGI::Compile)
+- [Plack::App::CGIBin::Streaming::Request](https://metacpan.org/pod/Plack::App::CGIBin::Streaming::Request)
+- [Plack::App::CGIBin::Streaming::IO](https://metacpan.org/pod/Plack::App::CGIBin::Streaming::IO)
