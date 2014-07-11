@@ -32,10 +32,27 @@ test_psgi
         $res=$cb->(POST '/io.cgi', [name=>'binary.com', country=>'Malaysia']);
         is $res->code, 200, 'status';
         is $res->content, <<'EOF', 'content';
+blah blah
 name=binary.com&country=Malaysia
 
 length: 32
 method: POST
+st1: 
+st2: 
+EOF
+
+        note '/io.cgi (large post)';
+        my $x='x' x 10000;
+        $res=$cb->(POST '/io.cgi', [x=>$x]);
+        is $res->code, 200, 'status';
+        is $res->content, <<"EOF", 'content';
+blah blah
+x=$x
+
+length: 10002
+method: POST
+st1: 
+st2: 1
 EOF
     };
 
