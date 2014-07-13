@@ -1,4 +1,5 @@
 #!/usr/bin/env plackup
+use lib qw!../blib/lib!;
 
 use strict;
 use warnings;
@@ -8,11 +9,38 @@ use Plack::App::CGIBin::Streaming;
 
 (my $root=__FILE__)=~s![^/]*$!cgi-bin!;
 
-my $app=Plack::App::CGIBin::Streaming->new
+$main::app=Plack::App::CGIBin::Streaming->new
     (
      root => $root,
-     request_params => [parse_headers => 1],
-    )->to_app;
+     preload => ['*.cgi'],
+     request_params => [
+                        parse_headers => 1,
+                        on_status_output => sub {
+                            my $r=$_[0];
+
+                            $r->print_header('X-Accel-Buffering', 'no')
+                                if $r->status==200 and
+                                   $r->content_type=~m!^text/html!i;
+                        },
+                        filter_after => sub {
+                            my ($r, $list)=@_;
+
+                            unless ($r->status==200 and
+                                    $r->content_type=~m!^text/html!i) {
+                                $r->filter_after=sub{};
+                                return;
+                            }
+
+                            for my $chunk (@$list) {
+                                if ($chunk=~/<!-- FlushHead -->/) {
+                                    $r->filter_after=sub{};
+                                    $r->flush;
+                                    return;
+                                }
+                            }
+                        },
+                       ],
+    );
 
 open ACCESS_LOG, '>>', 'access_log' or die "Cannot open access_log: $!";
 select +(select(ACCESS_LOG), $|=1)[0];
@@ -29,5 +57,5 @@ builder {
                                   format => '%h %l %u %t "%r" %>s %b %D',
                                   logger => sub {print ACCESS_LOG $_[0]},
                                  );
-    $app;
+    $main::app->to_app;
 };
