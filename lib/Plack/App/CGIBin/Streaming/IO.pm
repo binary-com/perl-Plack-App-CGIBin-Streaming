@@ -8,8 +8,7 @@ use Plack::App::CGIBin::Streaming;
 sub PUSHED {
     my ($class, $mode, $fh) = @_;
 
-    my $dummy;
-    return bless \$dummy, $class;
+    return bless +{}, $class;
 }
 
 sub WRITE {
@@ -23,13 +22,16 @@ sub WRITE {
 sub FLUSH {
     #my ($self, $fh) = @_;
 
+    return 0 if $_[0]->{in_flush};
+    local $_[0]->{in_flush}=1;
+
     unless ($Plack::App::CGIBin::Streaming::R) {
         require Carp;
         Carp::cluck "\$Plack::App::CGIBin::Streaming::R must be defined here";
-        return;
+        return 0;
     }
 
-    $Plack::App::CGIBin::Streaming::R->flush;
+    return $Plack::App::CGIBin::Streaming::R->flush;
 }
 
 sub FILL {
