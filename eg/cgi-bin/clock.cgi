@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-my $times=0+$ENV{QUERY_STRING};
+my $times=do {no warnings 'numeric'; 0+$ENV{QUERY_STRING}};
 $times=1 if $times<1;
 $times=100 if $times>100;
 
