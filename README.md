@@ -203,8 +203,9 @@ Copyright 2014 Binary.com
 # LICENSE
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a copy
-of the full license at:
+under the terms of the the Artistic License (2.0). A copy of the full
+license is provided by the `LICENSE` file in this distribution and can
+be obtained at
 
 [http://www.perlfoundation.org/artistic\_license\_2\_0](http://www.perlfoundation.org/artistic_license_2_0)
 
