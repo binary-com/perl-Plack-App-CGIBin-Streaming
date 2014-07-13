@@ -329,6 +329,45 @@ As a workaround, C<Plack::App::CGIBin::Streaming> contains this code:
 If your server dies when it receives a SIGCHLD, perhaps the module is loaded
 too late.
 
+=head1 EXAMPLE
+
+This distribution contains a complete example in the F<eg/> directory.
+After building the module by
+
+ perl Build.PL
+ ./Build
+
+you can try it out:
+
+ (cd eg && starman -l :5091 --workers=2 --preload-app app.psgi) &
+
+Then you should be able to access
+
+=over 4
+
+=item * L<http://localhost:5091/clock.cgi?30>
+
+=item * L<http://localhost:5091/flush.cgi>
+
+=back
+
+The clock example is basically the script displayed above. It works in Firefox.
+Other browsers don't support multipart HTTP messages.
+
+The flush example demonstrates filtering. It has been tested wich Chromium
+35 on Linux. The script first prints a part of the page that contains the
+HTML comment C<< <!-- FlushHead --> >>. The filter recognizes this token
+and pushes the page out. You should see a red background and the string
+C<loading -- please wait>. After 2 seconds the page should turn green and
+the string should change to C<loaded>.
+
+All of this very much depends on browser behavior. The intent is not to
+provide an example that works for all of them. Instead, the capabilities
+of this module are shown. You can also test these links with C<curl>
+instead.
+
+The example PSGI file also configures an F<access_log> and an F<error_log>.
+
 =head1 AUTHOR
 
 Torsten Förtsch E<lt>torsten.foertsch@gmx.netE<gt>
