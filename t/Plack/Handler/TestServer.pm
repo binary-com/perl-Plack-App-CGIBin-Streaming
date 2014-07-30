@@ -7,7 +7,11 @@ use parent 'Plack::Handler::Starman';
 sub run {
     my ($self, $app)=@_;
 
-    My::Server->new->run($app, +{workers=>1, %$self});
+    My::Server->new->run($app, +{
+                                 workers=>1,
+                                 error_log=>'error_log',
+                                 %$self,
+                                });
 }
 
 package My::Server;
