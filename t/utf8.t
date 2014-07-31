@@ -27,7 +27,6 @@ test_psgi
 
         note '/utf8.cgi';
         $res=$cb->(GET '/utf8.cgi');
-        note explain $res;
         like $res->content, qr/^is_utf8: 1/m, 'is a character string';
         ($res=$res->content)=~s/\nis_utf8: .+\n\z//s;
         is length($res), 2, '"ae oe" is 2 bytes (iso)';
