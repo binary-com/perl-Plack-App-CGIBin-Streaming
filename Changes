@@ -1,6 +1,8 @@
 Revision history for Plack-App-CGIBin-Streaming
 
 {{$NEXT}}
+
+0.02  2014-08-01 05:07:04 UTC
         - fix a problem with buffering PerlIO layers on top of our layer
         - implement suppress_flush
 
