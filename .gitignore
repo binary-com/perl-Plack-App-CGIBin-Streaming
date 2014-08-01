@@ -9,3 +9,4 @@ MYMETA.*
 /blib/
 /eg/access_log
 /eg/error_log
+error_log

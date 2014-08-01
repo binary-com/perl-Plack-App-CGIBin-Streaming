@@ -6,15 +6,14 @@ use warnings;
 use Plack::App::CGIBin::Streaming;
 
 sub PUSHED {
-    my ($class, $mode, $fh) = @_;
+    #my ($class, $mode, $fh) = @_;
 
-    return bless +{}, $class;
+    return bless +{}, $_[0];
 }
 
 sub WRITE {
     #my ($self, $buf, $fh) = @_;
 
-    # use $_[1] directly to avoid another copy
     $Plack::App::CGIBin::Streaming::R->print_content($_[1]);
     return length $_[1];
 }
@@ -25,13 +24,10 @@ sub FLUSH {
     return 0 if $_[0]->{in_flush};
     local $_[0]->{in_flush}=1;
 
-    unless ($Plack::App::CGIBin::Streaming::R) {
-        require Carp;
-        Carp::cluck "\$Plack::App::CGIBin::Streaming::R must be defined here";
-        return 0;
-    }
+    $Plack::App::CGIBin::Streaming::R->flush
+        unless $Plack::App::CGIBin::Streaming::R->suppress_flush;
 
-    return $Plack::App::CGIBin::Streaming::R->flush;
+    return 0;
 }
 
 sub FILL {

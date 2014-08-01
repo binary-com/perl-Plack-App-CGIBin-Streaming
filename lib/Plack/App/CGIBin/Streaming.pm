@@ -3,7 +3,7 @@ package Plack::App::CGIBin::Streaming;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 BEGIN {
     # this works around a bug in perl
@@ -66,15 +66,6 @@ sub mkapp {
         return sub {
             my $responder = shift;
 
-            my $class = ($self->request_class //
-                         'Plack::App::CGIBin::Streaming::Request');
-            local $R = $class->new
-                (
-                 env => $env,
-                 responder => $responder,
-                 @{$self->request_params//[]},
-                );
-
             local $env->{SCRIPT_NAME} = $env->{'plack.file.SCRIPT_NAME'};
             local $env->{PATH_INFO}   = $env->{'plack.file.PATH_INFO'};
 
@@ -85,17 +76,27 @@ sub mkapp {
             $|=0;
             binmode STDOUT, 'via(Plack::App::CGIBin::Streaming::IO)';
 
+            my $class = ($self->request_class //
+                         'Plack::App::CGIBin::Streaming::Request');
+            local $R = $class->new
+                (
+                 env => $env,
+                 responder => $responder,
+                 @{$self->request_params//[]},
+                );
+
             local *STDIN = $env->{'psgi.input'};
 
             # CGI::Compile localizes $0 and %SIG and calls
             # CGI::initialize_globals.
             my $err = eval {$sub->() // ''};
             my $exc = $@;
-            $R->finalize;
+            $R->suppress_flush=1;   # turn off normal flush behavior
             {
                 no warnings 'uninitialized';
                 binmode STDOUT;
             }
+            $R->finalize;
             unless (defined $err) { # $sub died
                 warn "$env->{REQUEST_URI}: $exc";
             }

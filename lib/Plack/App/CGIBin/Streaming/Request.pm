@@ -6,6 +6,19 @@ use warnings;
 no warnings 'uninitialized';
 use Carp;
 
+# my %trace=
+#     (
+#      new=>sub {warn "NEW: @_"},
+#      flush=>sub {warn "FLUSH: @_"},
+#      content=>sub {warn "CONTENT: @_"},
+#     );
+# use constant TRACE=>sub {
+#     my $what=shift;
+#     $trace{$what} and $trace{$what}->(@_);
+# } ;
+
+use constant TRACE=>0;
+
 our @attr;
 
 our $DEFAULT_CONTENT_TYPE='text/plain';
@@ -14,7 +27,8 @@ our $DEFAULT_MAX_BUFFER=8000;
 BEGIN {
     @attr=(qw/env responder writer _buffer _buflen _headers max_buffer
               content_type filter_before filter_after on_status_output
-              parse_headers _header_buffer status notes on_flush on_finalize/);
+              parse_headers _header_buffer status notes on_flush on_finalize
+              suppress_flush/);
     for (@attr) {
         my $attr=$_;
         no strict 'refs';
@@ -49,6 +63,12 @@ sub new {
         $self->$method($_[$i+1]);
     }
 
+    if (TRACE) {
+        (ref(TRACE) eq 'CODE'
+         ? TRACE->(new=>$self)
+         : warn "NEW $self");
+    }
+
     return $self;
 }
 
@@ -56,7 +76,14 @@ sub print_header {
     my $self = shift;
 
     croak "KEY => VALUE pairs expected" if @_%2;
-    #warn "print_header @_";
+    croak "It's too late to set a HTTP header" if $self->{writer};
+
+    if (TRACE) {
+        (ref(TRACE)
+         ? TRACE->(header=>$self, @_)
+         : warn "print_header $self: @_");
+    }
+
     push @{$self->{_headers}}, @_;
 }
 
@@ -88,12 +115,21 @@ sub print_content {
 
     my $len = 0;
     $len += length $_ for @data;
-    #warn "print_content: $len bytes written";
+
+    if (TRACE) {
+        (ref(TRACE)
+         ? TRACE->(content=>$self, @data)
+         : warn "print_content $self: $len bytes");
+    }
+
     push @{$self->{_buffer}}, @data;
     $len += $self->{_buflen};
     $self->{_buflen}=$len;
 
-    $self->flush if $len > $self->{max_buffer};
+    if ($len > $self->{max_buffer}) {
+        local $self->{suppress_flush};
+        $self->flush;
+    }
 
     $self->filter_after->($self, \@data);
 }
@@ -101,7 +137,13 @@ sub print_content {
 sub _status_out {
     my $self = shift;
     my $is_done = shift;
-    #warn "_status_out";
+
+    if (TRACE) {
+        (ref(TRACE)
+         ? TRACE->(status_out=>$self, $is_done)
+         : warn "status_out $self: $self->{status}");
+    }
+
     $self->print_header('Content-Type', $self->{content_type});
     $self->print_header('Content-Length', $self->{_buflen})
         if $is_done;
@@ -121,7 +163,12 @@ sub flush {
     my $self = shift;
     return 0 unless @{$self->{_buffer}};
 
-    #warn "flush @_";
+    if (TRACE) {
+        (ref(TRACE)
+         ? TRACE->(flush=>$self)
+         : warn "flush $self");
+    }
+
     $self->_status_out unless $self->{writer};
 
     $self->{writer}->write(join '', @{$self->{_buffer}});
@@ -136,12 +183,24 @@ sub flush {
 sub finalize {
     my $self = shift;
 
+    if (TRACE) {
+        (ref(TRACE)
+         ? TRACE->(finalize_start=>$self)
+         : warn "finalize start $self");
+    }
+
     $self->{on_finalize}->($self);
     if ($self->{writer}) {
         $self->{writer}->write(join '', @{$self->{_buffer}});
         $self->{writer}->close;
     } else {
         $self->_status_out(1);
+    }
+
+    if (TRACE) {
+        (ref(TRACE)
+         ? TRACE->(finalize_end=>$self)
+         : warn "finalize end $self");
     }
 
     %$self=();
@@ -507,6 +566,21 @@ C<on_flush> is called after every flush operation.
 C<on_finalize> is called before the request is finished. Actually, it's
 the first step of the C<finalize> operation. At this stage you are still able
 to print stuff. So, it's a good place to add a footer or similar.
+
+=item suppress_flush
+
+In Perl, there is a number of operations that implicitly preform flush
+operations on file handles, like C<system>.
+
+If you want complete control over when flush is issued, set this to a true
+value. It does not affect C<< $r->flush >> calls or implicit flushes caused
+by overflowing the output buffer (see C<max_buffer>). This flag only affects
+flushes caused by the PerlIO layer. So, if true, output is buffered even if
+C<$|> (autoflush) is true for the file handle.
+
+Note, this requires the L<Plack::App::CGIBin::Streaming::IO> PerlIO layer
+to be pushed onto the file handle. In the L<Plack::App::CGIBin::Streaming>
+environment, this is usually the case for C<STDOUT>.
 
 =back
 
