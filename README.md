@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/binary-com/perl-Plack-App-CGIBin-Streaming.svg?branch=master)](https://travis-ci.org/binary-com/perl-Plack-App-CGIBin-Streaming)
+
 # NAME
 
 Plack::App::CGIBin::Streaming - allow old style CGI applications to use

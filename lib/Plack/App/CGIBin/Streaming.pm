@@ -3,7 +3,7 @@ package Plack::App::CGIBin::Streaming;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 BEGIN {
     # this works around a bug in perl

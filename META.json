@@ -26,7 +26,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.036"
+            "Module::Build::Tiny" : "0.037"
          }
       },
       "develop" : {
@@ -61,7 +61,7 @@
          "web" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>",
       "Torsten Förtsch <torsten@binary.com>"
