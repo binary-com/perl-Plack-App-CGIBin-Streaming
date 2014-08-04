@@ -1,4 +1,5 @@
 /Plack-App-CGIBin-Streaming-*
+/libplack-app-cgibin-streaming-perl_*.deb
 /.build
 /_build*
 /Build
