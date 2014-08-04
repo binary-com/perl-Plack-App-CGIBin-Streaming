@@ -64,3 +64,5 @@ for i in control postinst prerm triggers; do
 done
 
 fakeroot dpkg-deb --build .debinst .
+
+rm -rf .debinst
