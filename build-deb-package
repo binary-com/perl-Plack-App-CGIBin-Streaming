@@ -18,8 +18,6 @@ while find .debinst -type d -empty -print0 | xargs -0 rmdir 2>/dev/null; do
     :
 done
 
-N="$(perl -MCPAN::Meta -le 'print +CPAN::Meta->load_file(q{META.json})
-                                             ->name')"
 V="$(perl -MCPAN::Meta -le 'print +CPAN::Meta->load_file(q{META.json})
                                              ->version')"
 R="$(perl -MCPAN::Meta -MModule::CoreList -le '
@@ -51,7 +49,7 @@ D="$(perl -CO -MCPAN::Meta -le '
 
 mkdir .debinst/DEBIAN
 cat >.debinst/DEBIAN/control <<EOF
-Package: lib$N-perl
+Package: libplack-app-cgibin-streaming-perl
 Architecture: all
 Depends: $R
 Version: $V-1
