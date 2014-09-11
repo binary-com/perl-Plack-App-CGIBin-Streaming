@@ -54,6 +54,20 @@ method: POST
 st1: 
 st2: 1
 EOF
+
+        note '/io.cgi (larger post)';
+        my $x='x' x 8_000_000;
+        $res=$cb->(POST '/io.cgi', [x=>$x]);
+        is $res->code, 200, 'status';
+        is $res->content, <<"EOF", 'content';
+blah blah
+x=$x
+
+length: 8000002
+method: POST
+st1: 
+st2: 1
+EOF
     };
 
 done_testing;

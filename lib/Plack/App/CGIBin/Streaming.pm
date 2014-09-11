@@ -86,6 +86,7 @@ sub mkapp {
                 );
 
             local *STDIN = $env->{'psgi.input'};
+            binmode STDIN, 'via(Plack::App::CGIBin::Streaming::IO)';
 
             # CGI::Compile localizes $0 and %SIG and calls
             # CGI::initialize_globals.
@@ -95,6 +96,7 @@ sub mkapp {
             {
                 no warnings 'uninitialized';
                 binmode STDOUT;
+                binmode STDIN;
             }
             $R->finalize;
             unless (defined $err) { # $sub died

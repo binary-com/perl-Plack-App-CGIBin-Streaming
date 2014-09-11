@@ -6,7 +6,7 @@ use warnings;
 no warnings 'uninitialized';
 use Carp;
 
-#my %trace=
+# my %trace=
 #    (
 #     new=>sub {warn "NEW: @_"},
 #     header=>sub {warn "HEADER: @_"},
@@ -16,11 +16,11 @@ use Carp;
 #     finalize_start=>sub {warn "FINALIZE START: @_"},
 #     finalize_end=>sub {warn "FINALIZE END: @_"},
 #    );
-#use constant TRACE=>sub {
+# use constant TRACE=>sub {
 #    my $what=shift;
 #    local $SIG{__WARN__};
 #    $trace{$what} and $trace{$what}->(@_);
-#} ;
+# } ;
 
 use constant TRACE=>0;
 

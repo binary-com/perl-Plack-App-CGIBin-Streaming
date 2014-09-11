@@ -30,10 +30,10 @@ sub FLUSH {
     return 0;
 }
 
-sub FILL {
-    #my ($self, $fh) = @_;
+sub READ {
+    #my ($self, $buf, $len, $fh) = @_;
 
-    die "This layer supports write operations only";
+    return $_[3]->read($_[1], $_[2]);
 }
 
 1;
