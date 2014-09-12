@@ -28,7 +28,7 @@ test_psgi
         my $cb=shift;
         my $res;
 
-        note '/io-seek.cgi';
+        note '/io-seek.cgi small';
 
         my $content=join '', map {pack('A19', $_)."\n"} 1..100;
         $res=$cb->(POST '/io-seek.cgi?10,5,3,82', Content=>$content);
@@ -39,6 +39,20 @@ test_psgi
             is $res->content, join( '',
                                     map {pack('A19', $_)."\n"}
                                     10, 5, 3, 82), 'content';
+        }
+
+        note '/io-seek.cgi large';
+
+        my $content=join '', map {pack('A19', $_)."\n"} 1..100000;
+        $res=$cb->(POST '/io-seek.cgi?1000,500,300,8200', Content=>$content);
+        is $res->code, 200, 'status';
+        note $res->request->header('content-length');
+
+    SKIP: {
+            skip 'input is not buffered', 1 if $res->content eq "n/a\n";
+            is $res->content, join( '',
+                                    map {pack('A19', $_)."\n"}
+                                    1000, 500, 300, 8200), 'content';
         }
     };
 
