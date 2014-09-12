@@ -8,7 +8,7 @@ use Plack::App::CGIBin::Streaming;
 sub PUSHED {
     #my ($class, $mode, $fh) = @_;
 
-    return bless +{}, $_[0];
+    return bless +{read_mode => (substr($_[1], 0, 1) eq 'r')}, $_[0];
 }
 
 sub WRITE {
@@ -21,7 +21,7 @@ sub WRITE {
 sub FLUSH {
     #my ($self, $fh) = @_;
 
-    return 0 if $_[0]->{in_flush};
+    return 0 if $_[0]->{in_flush} or $_[0]->{read_mode};
     local $_[0]->{in_flush}=1;
 
     $Plack::App::CGIBin::Streaming::R->flush
@@ -34,6 +34,16 @@ sub READ {
     #my ($self, $buf, $len, $fh) = @_;
 
     return $_[3]->read($_[1], $_[2]);
+}
+
+sub SEEK {
+    #my ($self, $pos, $whence, $fh) = @_;
+
+    return -1
+        unless ($_[0]->{read_mode} and
+                $Plack::App::CGIBin::Streaming::R->env->{'psgix.input.buffered'});
+
+    return $_[3]->seek($_[1], $_[2]) ? 0 : -1;
 }
 
 1;
