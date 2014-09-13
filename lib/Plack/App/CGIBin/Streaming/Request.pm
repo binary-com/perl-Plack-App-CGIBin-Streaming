@@ -33,7 +33,7 @@ BEGIN {
     @attr=(qw/env responder writer _buffer _buflen _headers max_buffer
               content_type filter_before filter_after on_status_output
               parse_headers _header_buffer status notes on_flush on_finalize
-              suppress_flush/);
+              suppress_flush binmode_ok/);
     for (@attr) {
         my $attr=$_;
         no strict 'refs';

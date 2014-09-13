@@ -46,6 +46,16 @@ sub SEEK {
     return $_[3]->seek($_[1], $_[2]) ? 0 : -1;
 }
 
+sub BINMODE {
+    #my ($self, $fh) = @_;
+
+    # pop the layer when we are done
+    return if $Plack::App::CGIBin::Streaming::R->binmode_ok;
+
+    # otherwise keep it
+    return 0;
+}
+
 1;
 
 __END__

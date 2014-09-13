@@ -3,7 +3,7 @@ package Plack::App::CGIBin::Streaming;
 use 5.014;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 BEGIN {
     # this works around a bug in perl
@@ -96,6 +96,7 @@ sub mkapp {
             };
             my $exc = $@;
             $R->suppress_flush=1;   # turn off normal flush behavior
+            $R->binmode_ok=1;       # allow binmode to remove the layer
             {
                 no warnings 'uninitialized';
                 binmode STDOUT;
@@ -306,16 +307,27 @@ or C<psgi.> is copied to C<%ENV>.
 
 =item C<STDIN> and C<STDOUT>
 
-C<STDIN> depends on the plack server implementation. It is simply an
-alias for the C<psgi.input> PSGI environment element.
+Both, C<STDIN> and C<STDOUT> are configured to use the
+L<Plack::App::CGIBin::Streaming::IO> PerlIO layer.
+On output, the layer captures the data and sends it to the
+request object. Flushing via C<$|> is also supported.
+On input, the layer simply converts calls like C<readline STDIN>
+into a method call on the underlying object.
 
-C<STDOUT> is configured using the L<Plack::App::CGIBin::Streaming::IO> PerlIO
-layer to capture output. The layer sends the output to the request object.
-Flushing via C<$|> is also supported.
+You can use PerlIO layers to turn the handles into UTF8 mode.
+However, refrain from using a simple C<binmode> to reverse the
+effects of a prior C<binmode STDOUT, ':utf8'>. This won't pop
+the L<Plack::App::CGIBin::Streaming::IO> layer but neither
+will it turn off UTF8 mode. This is considered a bug that I don't
+know how to fix. (See also below)
+
+Reading from C<STDIN> using UTF8 mode is also supported.
 
 =back
 
 =head2 Pitfalls and workarounds
+
+=head3 SIGCHLD vs. SIGCLD
 
 During the implementation I found a wierd bug. At least on Linux, perl
 supports C<CHLD> and C<CLD> as name of the signal that is sent when a child
@@ -334,6 +346,17 @@ As a workaround, C<Plack::App::CGIBin::Streaming> contains this code:
 
 If your server dies when it receives a SIGCHLD, perhaps the module is loaded
 too late.
+
+=head3 binmode
+
+Sometimes one needs to switch STDOUT into UTF8 mode and back. Especially the
+I<back> is problematic because the way it is done is often simply
+C<binmode STDOUT>. Currently, this won't revert the effect of a previous
+C<binmode STDOUT, ':utf8'>.
+
+Instead use:
+
+ binmode STDOUT, ':bytes';
 
 =head1 EXAMPLE
 
