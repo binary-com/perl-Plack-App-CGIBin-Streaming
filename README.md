@@ -3,8 +3,6 @@
 Plack::App::CGIBin::Streaming - allow old style CGI applications to use
 the plack streaming protocol
 
-[![Gitter chat](https://badges.gitter.im/binary-com/perl-Plack-App-CGIBin-Streaming.png)](https://gitter.im/binary-com/perl-Plack-App-CGIBin-Streaming)
-
 # SYNOPSIS
 
 in your `app.psgi`:
@@ -167,14 +165,25 @@ provides:
 
 - `STDIN` and `STDOUT`
 
-    `STDIN` depends on the plack server implementation. It is simply an
-    alias for the `psgi.input` PSGI environment element.
+    Both, `STDIN` and `STDOUT` are configured to use the
+    [Plack::App::CGIBin::Streaming::IO](https://metacpan.org/pod/Plack::App::CGIBin::Streaming::IO) PerlIO layer.
+    On output, the layer captures the data and sends it to the
+    request object. Flushing via `$|` is also supported.
+    On input, the layer simply converts calls like `readline STDIN`
+    into a method call on the underlying object.
 
-    `STDOUT` is configured using the [Plack::App::CGIBin::Streaming::IO](https://metacpan.org/pod/Plack::App::CGIBin::Streaming::IO) PerlIO
-    layer to capture output. The layer sends the output to the request object.
-    Flushing via `$|` is also supported.
+    You can use PerlIO layers to turn the handles into UTF8 mode.
+    However, refrain from using a simple `binmode` to reverse the
+    effects of a prior `binmode STDOUT, ':utf8'`. This won't pop
+    the [Plack::App::CGIBin::Streaming::IO](https://metacpan.org/pod/Plack::App::CGIBin::Streaming::IO) layer but neither
+    will it turn off UTF8 mode. This is considered a bug that I don't
+    know how to fix. (See also below)
+
+    Reading from `STDIN` using UTF8 mode is also supported.
 
 ## Pitfalls and workarounds
+
+### SIGCHLD vs. SIGCLD
 
 During the implementation I found a wierd bug. At least on Linux, perl
 supports `CHLD` and `CLD` as name of the signal that is sent when a child
@@ -193,6 +202,17 @@ As a workaround, `Plack::App::CGIBin::Streaming` contains this code:
 
 If your server dies when it receives a SIGCHLD, perhaps the module is loaded
 too late.
+
+### binmode
+
+Sometimes one needs to switch STDOUT into UTF8 mode and back. Especially the
+_back_ is problematic because the way it is done is often simply
+`binmode STDOUT`. Currently, this won't revert the effect of a previous
+`binmode STDOUT, ':utf8'`.
+
+Instead use:
+
+    binmode STDOUT, ':bytes';
 
 # EXAMPLE
 

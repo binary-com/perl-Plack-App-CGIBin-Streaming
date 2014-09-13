@@ -2,6 +2,9 @@ Revision history for Plack-App-CGIBin-Streaming
 
 {{$NEXT}}
 
+0.05  2014-09-13 12:59:05 UTC
+        - implement BINMODE and SEEK
+
 0.04  2014-09-12 16:37:33 UTC
         - localize $/ and $\
         - use our PerlIO layer also on STDIN to be more PSGI conform

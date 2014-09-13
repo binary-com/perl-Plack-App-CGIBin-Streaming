@@ -61,7 +61,7 @@
          "web" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "Jean-Yves Sireau <jy@binary.com>",
       "Kaveh Mousavi Zamani <kaveh@binary.com>",
