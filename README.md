@@ -3,8 +3,6 @@
 Plack::App::CGIBin::Streaming - allow old style CGI applications to use
 the plack streaming protocol
 
-[![Gitter chat](https://badges.gitter.im/binary-com/perl-Plack-App-CGIBin-Streaming.png)](https://gitter.im/binary-com/perl-Plack-App-CGIBin-Streaming)
-
 # SYNOPSIS
 
 in your `app.psgi`:

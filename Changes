@@ -1,6 +1,8 @@
 Revision history for Plack-App-CGIBin-Streaming
 
 {{$NEXT}}
+
+0.06  2014-09-15 08:57:56 UTC
         - set HTTP status 500 if possible if the script dies
 
 0.05  2014-09-13 12:59:05 UTC
