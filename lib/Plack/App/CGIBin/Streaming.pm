@@ -102,6 +102,11 @@ sub mkapp {
                 binmode STDOUT;
                 binmode STDIN;
             }
+            unless (defined $err) {
+                warn "$env->{REQUEST_URI}: It's too late to set a HTTP status"
+                    if $R->status_written;
+                $R->status(500);
+            }
             $R->finalize;
             unless (defined $err) { # $sub died
                 warn "$env->{REQUEST_URI}: $exc";
