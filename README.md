@@ -4,6 +4,8 @@ Plack::App::CGIBin::Streaming - allow old style CGI applications to use
 the plack streaming protocol
 
 [![Gitter chat](https://badges.gitter.im/binary-com/perl-Plack-App-CGIBin-Streaming.png)](https://gitter.im/binary-com/perl-Plack-App-CGIBin-Streaming)
+[![Build Status](https://travis-ci.org/binary-com/perl-Plack-App-CGIBin-Streaming.svg?branch=master)](https://travis-ci.org/binary-com/perl-Plack-App-CGIBin-Streaming)
+[![codecov](https://codecov.io/gh/binary-com/perl-Plack-App-CGIBin-Streaming/branch/master/graph/badge.svg)](https://codecov.io/gh/binary-com/perl-Plack-App-CGIBin-Streaming)
 
 # SYNOPSIS
 
