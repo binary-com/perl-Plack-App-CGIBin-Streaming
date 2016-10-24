@@ -6,7 +6,6 @@ perl:
     - "5.18"
     - "5.16"
     - "5.14"
-    - "5.12"
 script:
     - perl Build.PL && ./Build build && PERL5OPT=-MDevel::Cover ./Build test
 after_success:
