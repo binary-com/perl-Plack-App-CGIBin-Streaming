@@ -7,6 +7,10 @@ perl:
     - "5.16"
     - "5.14"
     - "5.12"
+install:
+   - cpanm --quiet --notest --skip-satisfied Dist::Zilla Dist::Zilla::App::Command::cover App::cpm
+   - cpm install -w 2 --mirror=http://cpan.cpantesters.org/ -g $(dzil authordeps --missing)
+   - cpm install -w 2 --mirror=http://cpan.cpantesters.org/ -v -g $(dzil listdeps --author --missing)
 script:
    - dzil smoke --release --author && dzil cover -test -report codecov
 
