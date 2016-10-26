@@ -10,7 +10,7 @@ WriteMakefile(
         CGI::Compile 0.17
         PerlIO::via  0.11
         Starman      0.3001
-
+        CGI          4.33
     /},
     ABSTRACT_FROM     => 'lib/Plack/App/CGIBin/Streaming.pm',
     AUTHOR            => 'Torsten Förtsch <torsten@binary.com>',
