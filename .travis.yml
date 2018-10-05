@@ -7,6 +7,6 @@ perl:
     - "5.16"
     - "5.14"
 script:
-    - perl Build.PL && ./Build build && PERL5OPT=-MDevel::Cover ./Build test
+    - perl Build.PL && ./Build build && cover -test
 after_success:
     - cover -report codecov
