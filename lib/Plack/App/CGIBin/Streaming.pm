@@ -5,6 +5,9 @@ use strict;
 use warnings;
 our $VERSION = '0.06';
 
+# TODO remove this line and fix critic problem
+## no critic
+
 BEGIN {
     # this works around a bug in perl
 
@@ -334,7 +337,7 @@ Reading from C<STDIN> using UTF8 mode is also supported.
 
 =head3 SIGCHLD vs. SIGCLD
 
-During the implementation I found a wierd bug. At least on Linux, perl
+During the implementation I found a weird bug. At least on Linux, perl
 supports C<CHLD> and C<CLD> as name of the signal that is sent when a child
 process exits. Also, when Perl calls a signal handler, it passes the signal
 name as the first parameter. Now the question arises, which name is passed

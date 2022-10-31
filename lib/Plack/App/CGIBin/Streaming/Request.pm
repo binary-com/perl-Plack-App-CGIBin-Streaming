@@ -3,8 +3,12 @@ package Plack::App::CGIBin::Streaming::Request;
 use 5.014;
 use strict;
 use warnings;
+# TODO remove this line and fix problems
+## no critic
 no warnings 'uninitialized';
 use Carp;
+
+## VERSION
 
 my %trace=
    (

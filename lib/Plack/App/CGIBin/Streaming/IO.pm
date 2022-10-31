@@ -5,6 +5,11 @@ use strict;
 use warnings;
 use Plack::App::CGIBin::Streaming;
 
+## VERSION
+
+# TODO remove this line and fix problems
+## no critic
+#
 sub PUSHED {
     #my ($class, $mode, $fh) = @_;
 
