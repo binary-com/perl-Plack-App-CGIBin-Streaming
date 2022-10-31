@@ -37,8 +37,8 @@ name=binary.com&country=Malaysia
 
 length: 32
 method: POST
-st1: 
-st2: 
+st1:
+st2:
 EOF
 
         note '/io.cgi (large post)';
@@ -51,7 +51,7 @@ x=$x
 
 length: 10002
 method: POST
-st1: 
+st1:
 st2: 1
 EOF
 
@@ -65,7 +65,7 @@ x=$x
 
 length: 8000002
 method: POST
-st1: 
+st1:
 st2: 1
 EOF
     };
